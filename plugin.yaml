@@ -1,0 +1,13 @@
+name: superpowers
+version: 0.1.0
+description: >
+  Full port of obra/superpowers for Hermes Agent — 14 process skills,
+  session bootstrap + gate-watch hooks, and subagent-driven development
+  mapped to delegate_task.
+author: Dante Labs
+provides_tools:
+  - superpowers_phase
+provides_hooks:
+  - pre_llm_call
+  - on_session_start
+  - post_tool_call
