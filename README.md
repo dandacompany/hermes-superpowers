@@ -7,6 +7,15 @@ systematic debugging, code review, and more), an enforcement layer that
 keeps the agent on-process via lifecycle hooks, and a spec-driven-development
 (SDD) workflow adapted to Hermes's `delegate_task` subagent model.
 
+한국어 문서: [README.ko.md](./README.ko.md)
+
+Community ports of superpowers on the Hermes Skills Hub copy only the skill
+documents — the process knowledge without the process discipline. This plugin
+takes the opposite position: it mirrors all three layers of the upstream
+design — the 14 skills, the automatic bootstrap-and-gate enforcement hooks,
+and the subagent execution model — so the workflow actually binds the agent
+instead of politely suggesting itself.
+
 Where upstream targets Claude Code, this plugin re-implements the same
 skills and workflow discipline as a Hermes plugin: `plugin.yaml` +
 `register(ctx)` wiring, a small phase state machine, three slash commands,
@@ -174,3 +183,11 @@ Based on [obra/superpowers](https://github.com/obra/superpowers) 6.1.1 by
 Jesse Vincent, MIT licensed. The 14 skill bodies here are near-verbatim
 mirrors of upstream with Hermes tool names substituted in; see
 `UPSTREAM.md` for the re-sync procedure.
+
+## License
+
+[MIT](./LICENSE) © Jesse Vincent (upstream skills) · Dante Labs (Hermes port)
+
+---
+
+**Dante Labs** · **YouTube** [@dante-labs](https://youtube.com/@dante-labs) · **Email** [dante@dante-labs.com](mailto:dante@dante-labs.com) · **Discord** [Dante Labs Community](https://discord.com/invite/rXyy5e9ujs) · **Support** [Buy Me a Coffee](https://buymeacoffee.com/dante.labs)

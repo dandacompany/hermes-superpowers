@@ -1,5 +1,7 @@
 # hermes-superpowers (한국어)
 
+English documentation: [README.md](./README.md)
+
 [obra/superpowers](https://github.com/obra/superpowers)를
 [Hermes Agent](https://github.com/NousResearch/hermes-agent)용으로 완전
 이식한 플러그인입니다. 브레인스토밍·플랜 작성·서브에이전트 기반 개발·TDD·
@@ -199,3 +201,11 @@ Claude Code → Hermes 전체 툴 매핑과 정본 재동기화 시 적용되는
 Vincent 작성, MIT 라이선스)을 기반으로 합니다. 여기 실린 14개 스킬
 본문은 정본을 거의 그대로 미러링한 뒤 Hermes 툴 이름만 치환한
 것입니다. 재동기화 절차는 `UPSTREAM.md`를 참고하세요.
+
+## 라이선스
+
+[MIT](./LICENSE) © Jesse Vincent (정본 스킬) · Dante Labs (Hermes 포트)
+
+---
+
+**Dante Labs** · **YouTube** [@dante-labs](https://youtube.com/@dante-labs) · **Email** [dante@dante-labs.com](mailto:dante@dante-labs.com) · **Discord** [Dante Labs Community](https://discord.com/invite/rXyy5e9ujs) · **Support** [Buy Me a Coffee](https://buymeacoffee.com/dante.labs)
