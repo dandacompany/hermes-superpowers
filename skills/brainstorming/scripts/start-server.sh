@@ -195,7 +195,7 @@ for _ in {1..50}; do
       sleep 0.1
     done
     if [[ "$alive" != "true" ]]; then
-      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal with: $SCRIPT_DIR/start-server.sh${PROJECT_DIR:+ --project-dir $PROJECT_DIR} --host $BIND_HOST --url-host $URL_HOST --foreground\"}"
+      echo "{\"error\": \"Server started but was killed. Retry in a persistent terminal: rerun start-server.sh with the same flags plus --foreground (script dir: $SCRIPT_DIR)\"}"
       exit 1
     fi
     grep "server-started" "$LOG_FILE" | head -1
