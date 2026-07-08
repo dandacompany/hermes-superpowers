@@ -24,6 +24,34 @@ REPLACEMENTS = [
     # Bash tool-name context (avoid touching "bash" as a generic shell/language word)
     (r"\bthe Bash tool\b", "the terminal toolset"),
     (r"\bBash tool\b", "terminal toolset"),
+    # --- narrowly-scoped rewords tied to STRIP_PATHS removals below; each
+    # pattern is specific enough to only ever match the one sentence/block
+    # it targets (see tools_dev/MANUAL_FIXUPS.md for the rationale) ---
+    (
+        r"If your harness appears here, read its reference file for special instructions:\n\n"
+        r"- Codex: `references/codex-tools\.md`\n"
+        r"- Pi: `references/pi-tools\.md`\n"
+        r"- Antigravity: `references/antigravity-tools\.md`\n\n",
+        "",
+    ),
+    (
+        r"User instructions \(CLAUDE\.md, AGENTS\.md, GEMINI\.md, etc, direct requests\) "
+        r"take precedence over skills, which in turn override default behavior\.",
+        "User instructions (host instruction files such as SOUL.md, and direct requests) "
+        "take precedence over skills, which in turn override default behavior.",
+    ),
+]
+
+# Other-harness / dev-log files that are dead weight in a Hermes-only port.
+# Removed after copytree in sync() below. Paths are relative to `dest`
+# (i.e. relative to the `skills/` root), matching the layout described in
+# tools_dev/MANUAL_FIXUPS.md.
+STRIP_PATHS = [
+    "using-superpowers/references/codex-tools.md",
+    "using-superpowers/references/pi-tools.md",
+    "using-superpowers/references/antigravity-tools.md",
+    "systematic-debugging/CREATION-LOG.md",
+    "writing-skills/examples/CLAUDE_MD_TESTING.md",
 ]
 
 HEADER_NOTE = (
@@ -56,6 +84,17 @@ def sync(source: Path, dest: Path) -> list[str]:
                 text = (m.group(1) + HEADER_NOTE + text[m.end():]) if m else HEADER_NOTE + text
             md.write_text(text, encoding="utf-8")
         synced.append(skill_dir.name)
+
+    # Strip other-harness / dev-log leftovers, then prune any directory
+    # (e.g. references/, examples/) that is now empty as a result.
+    for rel in STRIP_PATHS:
+        stripped = dest / rel
+        if stripped.exists():
+            stripped.unlink()
+            parent = stripped.parent
+            if parent != dest and not any(parent.iterdir()):
+                parent.rmdir()
+
     return synced
 
 

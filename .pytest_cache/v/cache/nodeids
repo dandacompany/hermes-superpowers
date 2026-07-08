@@ -6,6 +6,8 @@
   "tests/test_commands.py::test_phase_transition",
   "tests/test_commands.py::test_status_shows_phase",
   "tests/test_commands.py::test_superpowers_command_mentions_skills",
+  "tests/test_harness_leftovers.py::test_no_dangling_references_to_removed_files",
+  "tests/test_harness_leftovers.py::test_other_harness_files_removed",
   "tests/test_hooks.py::test_done_phase_still_returns_context",
   "tests/test_hooks.py::test_first_turn_injects_bootstrap",
   "tests/test_hooks.py::test_later_turns_inject_phase_reminder",

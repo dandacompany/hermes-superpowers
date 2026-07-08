@@ -160,6 +160,12 @@ Claude Code → Hermes 전체 툴 매핑과 정본 재동기화 시 적용되는
   됩니다. 14개 스킬 전부가 `tools_dev/sync_upstream.py`로 기계적으로
   재매핑되었고, 몇 군데는 `tools_dev/MANUAL_FIXUPS.md`에 기록된 손수
   작성한 문단이 추가되어 있습니다.
+- **타 하네스 어댑테이션 파일 제거.** 정본에는 이 포트가 실행하지 않는
+  하네스(Codex, Pi, Antigravity)용 레퍼런스 문서와 Claude Code 전용
+  실습 예제(`CLAUDE_MD_TESTING.md`), 그리고 정본 개발 로그
+  (`CREATION-LOG.md`)가 포함되어 있습니다. Hermes에는 해당 사항이 없으므로
+  매핑하지 않고 그대로 삭제했습니다. 무엇을 지웠고 재동기화 시 어떻게
+  다시 유지되는지는 `tools_dev/MANUAL_FIXUPS.md`를 참고하세요.
 
 ## 강의 수강생용 따라하기 절차
 

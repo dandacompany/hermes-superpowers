@@ -161,6 +161,12 @@ upstream.
   on Hermes; all 14 skills were mechanically re-mapped by
   `tools_dev/sync_upstream.py` plus a handful of hand-written passages
   tracked in `tools_dev/MANUAL_FIXUPS.md`.
+- **Other-harness adaptation files removed.** Upstream ships reference docs
+  for harnesses this port doesn't run (Codex, Pi, Antigravity) and a
+  Claude-Code-specific worked example (`CLAUDE_MD_TESTING.md`), plus an
+  upstream dev log (`CREATION-LOG.md`). None of it applies on Hermes, so
+  it's deleted rather than mapped; see `tools_dev/MANUAL_FIXUPS.md` for
+  what was removed and how re-syncs stay clean of it.
 
 ## Attribution
 

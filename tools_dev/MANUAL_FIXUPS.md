@@ -13,6 +13,48 @@ semantics** (how Hermes primitives like `delegate_task`, `clarify`,
 `skill_view`, `max_concurrent_children` behave). The surrounding upstream
 methodology text was left untouched.
 
+## Other-harness / dev-log leftovers removed (quality cleanup, not scanner-motivated)
+
+Upstream `superpowers` ships adaptation docs and dev artifacts for harnesses
+this Hermes port doesn't run, plus one Claude-Code-specific worked example.
+None of it applies here, so it was deleted outright rather than mapped:
+
+- `skills/using-superpowers/references/codex-tools.md`
+- `skills/using-superpowers/references/pi-tools.md`
+- `skills/using-superpowers/references/antigravity-tools.md`
+- `skills/systematic-debugging/CREATION-LOG.md` (upstream dev log, not
+  agent-facing content)
+- `skills/writing-skills/examples/CLAUDE_MD_TESTING.md` (a worked example
+  specific to Claude Code's CLAUDE.md convention)
+
+Two directories (`using-superpowers/references/`, `writing-skills/examples/`)
+became empty as a result and were removed too.
+
+**Made durable in `tools_dev/sync_upstream.py`:**
+
+- `STRIP_PATHS` lists the five paths above (relative to `skills/`); `sync()`
+  deletes them right after `copytree` and prunes their parent directory if it
+  is left empty, so a fresh re-sync from upstream won't reintroduce them.
+- `REPLACEMENTS` gained two narrowly-scoped entries (matched against the
+  _exact_ upstream text, not a blanket substitution) that fix the two
+  dangling references the deletions would otherwise leave in
+  `skills/using-superpowers/SKILL.md`:
+  1. Strips the "If your harness appears here..." intro line plus the
+     Codex/Pi/Antigravity bullets out of the `## Platform Adaptation`
+     section (the Hermes bullet is still added by the manual fixup
+     documented below, under "skills/using-superpowers/SKILL.md").
+  2. Rewords the "User Instructions" sentence away from naming
+     `CLAUDE.md, AGENTS.md, GEMINI.md` to generic Hermes phrasing
+     ("host instruction files such as SOUL.md").
+
+**Guarded by:** `tests/test_harness_leftovers.py` — asserts the five paths
+don't exist under `skills/` and that no `.md` under `skills/` mentions
+`codex-tools.md`, `pi-tools.md`, `antigravity-tools.md`, `CREATION-LOG.md`,
+or `CLAUDE_MD_TESTING`.
+
+**Re-apply after re-sync:** nothing manual — `STRIP_PATHS` and the two new
+`REPLACEMENTS` entries run automatically as part of `sync()`.
+
 ## skills/subagent-driven-development/SKILL.md
 
 - **Section added:** `## Dispatching on Hermes`, inserted directly after the
@@ -38,11 +80,15 @@ methodology text was left untouched.
   substitute for invoking the skill explicitly; `/sp-phase` only advances a
   phase-gated skill after the human partner has approved the current
   phase's output — the agent must not call it unilaterally.
-- **Platform Adaptation list:** added a line `- Hermes: see "Loading Skills
-on Hermes" above` alongside the existing Codex/Pi/Antigravity entries.
-- **Re-apply after re-sync:** re-insert the section at the same anchor
-  (after Red Flags, before Platform Adaptation) and re-add the Hermes
-  bullet to the Platform Adaptation list.
+- **Platform Adaptation list:** as of the harness-leftovers cleanup (see
+  "Other-harness / dev-log leftovers removed" section below), the
+  Codex/Pi/Antigravity bullets are gone — `sync_upstream.py`'s
+  `REPLACEMENTS` now strips that whole block mechanically on re-sync. The
+  list reads just `- Hermes: see "Loading Skills on Hermes" above`.
+- **Re-apply after re-sync:** re-insert the `## Loading Skills on Hermes`
+  section at the same anchor (after Red Flags, before Platform Adaptation).
+  The Platform Adaptation list itself no longer needs a manual bullet
+  insert — `REPLACEMENTS` produces the final Hermes-only list directly.
 
 ## skills/dispatching-parallel-agents/SKILL.md
 
@@ -59,8 +105,12 @@ on Hermes" above` alongside the existing Codex/Pi/Antigravity entries.
   example block with the same `delegate_task(tasks=[...])` batch form and
   concurrency-limit paragraph.
 
-## skills/using-superpowers/references/pi-tools.md
+## skills/using-superpowers/references/pi-tools.md (historical — file removed)
 
+- **Superseded:** this file was deleted in the "Other-harness / dev-log
+  leftovers removed" cleanup above (`STRIP_PATHS`). The wording fix recorded
+  below applied to it while it still existed in the tree; kept here only as
+  a record — there is nothing left to re-apply.
 - **Wording fix (not upstream-semantic, purely a mechanical-substitution
   artifact):** the `Task lists` section used to read "Older Superpowers
   docs may refer to `a markdown checklist`; treat that as the task-tracking
@@ -70,8 +120,8 @@ on Hermes" above` alongside the existing Codex/Pi/Antigravity entries.
   "Older Superpowers docs may refer to maintaining a markdown checklist;
   treat that instruction as the task-tracking action described above." No
   semantic change — cosmetic smoothing of a mechanical replacement seam.
-- **Re-apply after re-sync:** re-apply the same wording fix if the mechanical
-  replacement regenerates the awkward phrasing.
+- **Re-apply after re-sync:** N/A — the file no longer exists post-cleanup;
+  `STRIP_PATHS` deletes it again if a re-sync recreates it.
 
 ## Codex adversarial review (F5) — `Subagent (general-purpose):` template leftovers
 
@@ -101,6 +151,10 @@ on Hermes" above` alongside the existing Codex/Pi/Antigravity entries.
   template text.
 - **Guarded by:** `tests/test_no_claude_toolnames.py::test_no_forbidden_toolnames`
   (added `r"Subagent \(general-purpose\)"` to `FORBIDDEN`).
+- **Note:** of the 7 files listed above, `references/pi-tools.md` and
+  `references/antigravity-tools.md` were later deleted entirely (see
+  "Other-harness / dev-log leftovers removed"); the fix record for them is
+  kept for history only.
 
 ## Codex adversarial review (R2) — pseudo-header → real `delegate_task(...)` call syntax
 
@@ -133,7 +187,10 @@ toolsets)`) documented in `references/tool-mapping.md` and used correctly
 - **Re-apply after re-sync:** if a future re-sync regenerates the pseudo-header
   (via the `REPLACEMENTS` mapping in `sync_upstream.py` that produced it),
   re-apply the same `delegate_task(...)` skeleton + one-line note in place of
-  it in all 7 files above, and re-check the two reference-doc inline mentions.
+  it in the files above that still exist. The two reference-doc inline
+  mentions (`references/antigravity-tools.md`, `references/pi-tools.md`) are
+  moot — both files were deleted in the "Other-harness / dev-log leftovers
+  removed" cleanup and `STRIP_PATHS` keeps them gone.
 
 ## Tests
 
