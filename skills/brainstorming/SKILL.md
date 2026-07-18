@@ -15,6 +15,12 @@ Start by understanding the current project context, then ask questions one at a 
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
+<HERMES-QUESTION-GATE>
+Every user-facing question MUST use `clarify`. Never ask a user-facing question in plain assistant text. Ask exactly one question per `clarify` call. This includes the visual companion offer, design-section approval, written-spec review, and every ordinary clarification.
+
+The only alternate question surface is an approved Visual Companion screen. After approval through `clarify`, use `superpowers_visual_companion` for a genuinely visual choice and do not repeat the browser question in assistant prose. If the expected answer is text, use `clarify`.
+</HERMES-QUESTION-GATE>
+
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
 Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
@@ -69,7 +75,7 @@ digraph brainstorming {
 - Check out the current project state first (files, docs, recent commits)
 - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
 - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
-- For appropriately-scoped projects, ask questions one at a time to refine the idea
+- For appropriately-scoped projects, ask questions one at a time with `clarify` to refine the idea
 - Prefer multiple choice questions when possible, but open-ended is fine too
 - Only one question per message - if a topic needs more exploration, break it into multiple questions
 - Focus on understanding: purpose, constraints, success criteria
@@ -146,10 +152,16 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
 
-**Offering the companion (just-in-time):** Do NOT offer it upfront. Wait until a question would genuinely be clearer shown than told — a real mockup / layout / diagram question, not merely a UI *topic*. The first time that happens, offer it then, as its own message:
-> "This next part might be easier if I show you — I can put together mockups, diagrams, and comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to? I'll open it for you."
+**Offering the companion (just-in-time):** Do NOT offer it upfront. Wait until a question would genuinely be clearer shown than told — a real mockup / layout / diagram question, not merely a UI *topic*. The first time that happens, the visual companion offer MUST use `clarify` as its own interaction:
 
-**This offer MUST be its own message.** Only the offer — no clarifying question, summary, or other content. Wait for the user's response. If they accept, start the server with `--open` so their browser opens to the first screen automatically. If they decline, continue text-only and don't offer again unless they raise it.
+```python
+clarify(
+    question="This next part would be clearer visually. Use the browser-based Visual Companion?",
+    choices=["Use Visual Companion (Recommended)", "Continue text-only"],
+)
+```
+
+Do not put the offer in plain assistant text or combine it with another question. Wait for the `clarify` result. If they accept, call `superpowers_visual_companion` with `action="start"`, the current project root, `user_approved=true`, and `open_browser=true`; the tool rejects start without this explicit approval flag. Then use `action="show"` for the first screen. If they decline, continue text-only and don't offer again unless they raise it.
 
 **Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**
 

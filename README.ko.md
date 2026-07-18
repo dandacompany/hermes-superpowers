@@ -14,7 +14,8 @@ English documentation: [README.md](./README.md)
 정본(upstream)은 Claude Code를 대상으로 하지만, 이 플러그인은 같은 스킬과
 워크플로 규율을 Hermes 플러그인 형태로 재구현합니다: `plugin.yaml` +
 `register(ctx)` 와이어링, 작은 8단계 상태기계, 슬래시 커맨드 3종, 그리고
-에이전트가 직접 호출해 워크플로를 진행시킬 수 있는 툴 1종.
+워크플로 단계 전이와 브라우저 Visual Companion을 담당하는
+Hermes 네이티브 툴 2종을 제공합니다.
 
 ## 요구 버전과 네이티브 어댑터
 
@@ -31,6 +32,19 @@ English documentation: [README.md](./README.md)
   보안·품질 파이프라인입니다.
 - `simplify-code`는 사용자가 명시적으로 요청했을 때만 선택적으로 실행하고,
   `python-debugpy`는 Python 체계적 디버깅 중 상태 관찰이 필요할 때만 사용합니다.
+
+## 질문 게이트와 Visual Companion
+
+- 모든 사용자 대상 질문은 Hermes의 `clarify` 툴로만 수행합니다.
+  요구사항 확인, 피드백, 디자인·플랜 승인, 리뷰, Visual Companion
+  사용 제안이 모두 포함되며 평문 응답에 질문을 쓰는 것은 금지됩니다.
+- 이 게이트는 워크플로 스킬에 명시되고, `pre_llm_call`이 매 턴 다시
+  주입합니다. `clarify` 한 번에는 질문 하나만 허용합니다.
+- 사용자가 `clarify`로 승인하면 `superpowers_visual_companion`이
+  Claude Superpowers의 브라우저 흐름을 Hermes 네이티브 툴로 제공합니다:
+  `start`, `show`, `events`, `status`, `stop`.
+- 시각적 선택은 브라우저에만 표시하고 평문에 중복하지 않습니다.
+  글로 답해야 하는 후속 질문은 다시 `clarify`를 사용합니다.
 
 ## 설치
 
@@ -71,7 +85,7 @@ hermes plugins list
 ```
 
 `superpowers`가 `Source: git`(옵션 B) 또는 로컬 디렉토리(옵션 A), 버전
-`0.2.0`, 상태 `not enabled`로 표시되어야 합니다 — 플러그인은 기본적으로
+`0.3.0`, 상태 `not enabled`로 표시되어야 합니다 — 플러그인은 기본적으로
 옵트인입니다. 활성화:
 
 ```bash
@@ -80,7 +94,7 @@ hermes plugins enable superpowers
 
 이때 `Allow this plugin to replace built-in tools (e.g. shell_exec,
 write_file)? [y/N]`라고 묻습니다 — **no**로 답하세요. 이 플러그인은 훅과
-툴 1종, 커맨드 3종만 등록할 뿐 어떤 내장 툴도 오버라이드하지 않습니다.
+툴 2종, 커맨드 3종만 등록할 뿐 어떤 내장 툴도 오버라이드하지 않습니다.
 세션을 재시작하거나(게이트웨이라면 `hermes gateway restart`) 새 세션을
 시작하면 플러그인이 적용됩니다.
 
@@ -116,7 +130,8 @@ hermes logs --level WARNING | grep -i plugin
   주입합니다. 정본의 `SessionStart` 훅과 같은 역할입니다.
 - **매 턴 게이트 리마인더** (`pre_llm_call`, 이후 모든 턴): 현재 단계와
   무엇이 막고 있는지("디자인 승인 전에는 구현 금지" 등)를 한 줄로
-  `<superpowers-gate>` 태그에 담아 주입합니다.
+  `<superpowers-gate>` 태그에 담아 주입하고, `clarify` 질문 게이트도 같이
+  재주입합니다.
 - **쓰기 툴 경고 승격** (`post_tool_call` + 다음 `pre_llm_call`): 워크플로가
   구현 이전 단계(`idle` ~ `plan-approved`)인데 파일을 쓰는 툴(`write_file`,
   `patch`)이 실행되면, 다음 턴의 게이트 리마인더가 `WARNING`으로 격상되어 에이전트에게

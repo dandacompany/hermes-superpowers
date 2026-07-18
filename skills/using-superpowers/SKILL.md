@@ -9,6 +9,14 @@ description: Use when starting any conversation - establishes how to find and us
 If you were dispatched as a subagent to execute a specific task, ignore this skill.
 </SUBAGENT-STOP>
 
+<HERMES-QUESTION-GATE>
+Every user-facing question MUST use `clarify`. Never ask a user-facing question in plain assistant text. Ask exactly one question per `clarify` call; if a topic needs more exploration, make separate calls after each answer.
+
+This includes clarification, feedback, approval, review, and offers such as the visual companion. Rhetorical prose that does not request an answer is not a user-facing question. Terminal safety approval remains owned by the terminal tool. A `delegate_task` child cannot call `clarify`; it must return a `QUESTIONS` section so the orchestrator can ask.
+
+After the user has approved the Visual Companion via `clarify`, a genuinely visual choice may be presented with `superpowers_visual_companion` instead. Do not duplicate that browser question in plain assistant text. Any follow-up that expects a terminal answer returns to `clarify`.
+</HERMES-QUESTION-GATE>
+
 <EXTREMELY-IMPORTANT>
 If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
 

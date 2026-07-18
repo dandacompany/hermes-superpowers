@@ -42,6 +42,26 @@ sync preservation behavior.
 **Re-apply after re-sync:** nothing. The sync script must report 11 mirrored
 skills while leaving the three adapters untouched.
 
+## Brainstorming interaction layer (protected files)
+
+`skills/brainstorming/SKILL.md` and `visual-companion.md` remain based on the
+upstream skill but carry two Hermes-owned contracts:
+
+- every user-facing textual question goes through `clarify`, reinforced by
+  the per-turn hook;
+- the upstream browser companion is operated through the native
+  `superpowers_visual_companion` tool (`start/show/events/status/stop`).
+
+`PROTECTED_SKILL_FILES` in `sync_upstream.py` saves and restores these two
+files around the upstream `copytree`. The rest of the brainstorming directory,
+including the server implementation and templates, continues to update from
+upstream. When upstream changes either protected document, rebase it manually
+instead of silently discarding the Hermes gates.
+
+**Guarded by:** `tests/test_question_and_visual_companion.py` checks the hard
+question wording, per-turn reinjection, tool registration, manifest metadata,
+sync preservation, path safety, and a real start/show/status/events/stop loop.
+
 ## Other-harness / dev-log leftovers removed (quality cleanup, not scanner-motivated)
 
 Upstream `superpowers` ships adaptation docs and dev artifacts for harnesses
