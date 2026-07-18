@@ -10,6 +10,15 @@ import re
 import shutil
 from pathlib import Path
 
+# These public Superpowers entry points intentionally delegate their core
+# methodology to Hermes Agent 0.18.0+ built-ins. They are maintained as thin
+# adapters in this repository and must survive an upstream mirror refresh.
+ADAPTER_SKILLS = {
+    "writing-plans",
+    "systematic-debugging",
+    "test-driven-development",
+}
+
 REPLACEMENTS = [
     # --- multi-word / longer patterns first, so shorter ones don't clobber them ---
     (r"\bthe Task tool\b", "delegate_task"),
@@ -72,6 +81,8 @@ def sync(source: Path, dest: Path) -> list[str]:
     dest.mkdir(parents=True, exist_ok=True)
     synced = []
     for skill_dir in sorted(p for p in source.iterdir() if p.is_dir()):
+        if skill_dir.name in ADAPTER_SKILLS:
+            continue
         target = dest / skill_dir.name
         if target.exists():
             shutil.rmtree(target)

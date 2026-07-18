@@ -62,6 +62,32 @@ skill_view("superpowers:systematic-debugging")
 skill_view("superpowers:subagent-driven-development")
 ```
 
+Hermes 0.18.0+ also ships flat, built-in development skills. This plugin does
+not override them: plugin skills are explicitly namespaced as
+`superpowers:<name>` and coexist with flat names. Three stable Superpowers
+entry points are Hermes-native adapters:
+
+| Superpowers entry point               | Native skill loaded by the adapter |
+| ------------------------------------- | ---------------------------------- |
+| `superpowers:writing-plans`           | `plan`                             |
+| `superpowers:systematic-debugging`    | `systematic-debugging`             |
+| `superpowers:test-driven-development` | `test-driven-development`          |
+
+Always enter through the namespaced Superpowers skill while following this
+workflow. The adapter loads the native skill and then adds the design gate,
+plan/SDD contract, supporting references, and completion rules.
+
+Two other flat skills are helpers, not replacements:
+
+- Load `simplify-code` only after implementation is green and only when the
+  user explicitly requests cleanup or simplification.
+- Load `python-debugpy` from systematic debugging only when a Python problem
+  genuinely requires stepping, post-mortem inspection, or process attach.
+- Keep `superpowers:requesting-code-review` for requirements/plan compliance.
+  The flat `requesting-code-review` is a separate pre-commit security and
+  quality gate and may run afterward when the user is preparing to commit,
+  push, or merge.
+
 The Hermes plugin also injects reminders on its own: a `pre_llm_call` hook
 bootstraps this skill at conversation start and re-injects HARD-GATE
 reminders (e.g. "no implementation before brainstorming approval") as the

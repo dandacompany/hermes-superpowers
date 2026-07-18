@@ -1,25 +1,44 @@
 # hermes-superpowers
 
-A full port of [obra/superpowers](https://github.com/obra/superpowers) for
-[Hermes Agent](https://github.com/NousResearch/hermes-agent): 14 process
-skills (brainstorming, writing plans, subagent-driven development, TDD,
-systematic debugging, code review, and more), an enforcement layer that
-keeps the agent on-process via lifecycle hooks, and a spec-driven-development
-(SDD) workflow adapted to Hermes's `delegate_task` subagent model.
+A Hermes-native hybrid port of
+[obra/superpowers](https://github.com/obra/superpowers) for
+[Hermes Agent](https://github.com/NousResearch/hermes-agent): 14 stable
+process-skill entry points, an enforcement layer that keeps the agent
+on-process via lifecycle hooks, and a spec-driven-development (SDD) workflow
+adapted to Hermes's `delegate_task` subagent model.
 
 한국어 문서: [README.ko.md](./README.ko.md)
 
 Community ports of superpowers on the Hermes Skills Hub copy only the skill
 documents — the process knowledge without the process discipline. This plugin
-takes the opposite position: it mirrors all three layers of the upstream
-design — the 14 skills, the automatic bootstrap-and-gate enforcement hooks,
-and the subagent execution model — so the workflow actually binds the agent
-instead of politely suggesting itself.
+takes the opposite position: it preserves all three layers of the upstream
+design — the 14-skill workflow surface, automatic bootstrap-and-gate hooks,
+and the subagent execution model — while delegating overlapping methodology
+to Hermes' own built-ins.
 
 Where upstream targets Claude Code, this plugin re-implements the same
 skills and workflow discipline as a Hermes plugin: `plugin.yaml` +
 `register(ctx)` wiring, a small phase state machine, three slash commands,
 and one tool the agent can call to advance the workflow.
+
+## Requirements and native adapters
+
+- **Hermes Agent 0.18.0 or newer** is required.
+- Plugin skills are read-only, explicit namespaced loads such as
+  `superpowers:brainstorming`. They coexist with flat Hermes built-ins and do
+  not replace them.
+- Three namespaced entry points are thin adapters:
+  `superpowers:writing-plans` loads `plan`,
+  `superpowers:systematic-debugging` loads `systematic-debugging`, and
+  `superpowers:test-driven-development` loads `test-driven-development`.
+  Each adapter then adds the Superpowers approval, SDD, supporting-reference,
+  and completion contract.
+- `superpowers:requesting-code-review` remains plugin-owned because it reviews
+  work against the approved plan and requirements. Hermes' flat skill with the
+  same bare name is a separate pre-commit security and quality pipeline.
+- `simplify-code` is optional and only runs on explicit user request;
+  `python-debugpy` is a conditional evidence-gathering helper inside Python
+  systematic debugging.
 
 ## Install
 
@@ -59,7 +78,7 @@ hermes plugins list
 ```
 
 You should see `superpowers` listed with `Source: git` (Option B) or a
-local directory (Option A), version `0.1.0`, and status `not enabled` —
+local directory (Option A), version `0.2.0`, and status `not enabled` —
 plugins are opt-in by default. Enable it:
 
 ```bash
@@ -167,9 +186,10 @@ upstream.
   injected reminders, not on the plugin refusing to let a tool run.
 - **`skill_view` instead of the Skill tool.** Claude Code's `Skill tool` /
   `superpowers:<name>` invocation becomes `skill_view("superpowers:<name>")`
-  on Hermes; all 14 skills were mechanically re-mapped by
-  `tools_dev/sync_upstream.py` plus a handful of hand-written passages
-  tracked in `tools_dev/MANUAL_FIXUPS.md`.
+  on Hermes. Eleven skill bodies are mechanically re-mapped by
+  `tools_dev/sync_upstream.py`; three are protected Hermes-native adapters.
+  Hand-written passages and adapter rules are tracked in
+  `tools_dev/MANUAL_FIXUPS.md`.
 - **Other-harness adaptation files removed.** Upstream ships reference docs
   for harnesses this port doesn't run (Codex, Pi, Antigravity) and a
   Claude-Code-specific worked example (`CLAUDE_MD_TESTING.md`), plus an
@@ -180,9 +200,9 @@ upstream.
 ## Attribution
 
 Based on [obra/superpowers](https://github.com/obra/superpowers) 6.1.1 by
-Jesse Vincent, MIT licensed. The 14 skill bodies here are near-verbatim
-mirrors of upstream with Hermes tool names substituted in; see
-`UPSTREAM.md` for the re-sync procedure.
+Jesse Vincent, MIT licensed. Eleven skill bodies are near-verbatim mirrors
+with Hermes tool names substituted; three stable entry points are
+Hermes-native adapters. See `UPSTREAM.md` for the re-sync procedure.
 
 ## License
 

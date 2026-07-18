@@ -129,7 +129,8 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Implementation:**
 
-- Invoke the writing-plans skill to create a detailed implementation plan
+- Invoke `superpowers:writing-plans`; its Hermes adapter loads the built-in
+  `plan` skill and adds the approved-design and SDD plan contract
 - Do NOT invoke any other skill. writing-plans is the next step.
 
 ## Key Principles

@@ -3,9 +3,10 @@
 English documentation: [README.md](./README.md)
 
 [obra/superpowers](https://github.com/obra/superpowers)를
-[Hermes Agent](https://github.com/NousResearch/hermes-agent)용으로 완전
-이식한 플러그인입니다. 브레인스토밍·플랜 작성·서브에이전트 기반 개발·TDD·
-체계적 디버깅·코드 리뷰 등 14종의 프로세스 스킬, 에이전트가 프로세스를
+[Hermes Agent](https://github.com/NousResearch/hermes-agent)용으로 만든
+네이티브 하이브리드 이식 플러그인입니다. 브레인스토밍·플랜 작성·서브에이전트
+기반 개발·TDD·체계적 디버깅·코드 리뷰 등 14개의 안정적인 프로세스 스킬
+진입점, 에이전트가 프로세스를
 벗어나지 않도록 매 턴 리마인드를 주입하는 훅 레이어, 그리고 Hermes의
 `delegate_task` 서브에이전트 모델에 맞춘 SDD(스펙 주도 개발) 워크플로를
 제공합니다.
@@ -14,6 +15,22 @@ English documentation: [README.md](./README.md)
 워크플로 규율을 Hermes 플러그인 형태로 재구현합니다: `plugin.yaml` +
 `register(ctx)` 와이어링, 작은 8단계 상태기계, 슬래시 커맨드 3종, 그리고
 에이전트가 직접 호출해 워크플로를 진행시킬 수 있는 툴 1종.
+
+## 요구 버전과 네이티브 어댑터
+
+- **Hermes Agent 0.18.0 이상**이 필요합니다.
+- 플러그인 스킬은 `superpowers:brainstorming`처럼 명시적인 네임스페이스로
+  로드됩니다. 평면 Hermes 빌트인과 병존하며 덮어쓰지 않습니다.
+- 세 진입점은 얇은 어댑터입니다.
+  `superpowers:writing-plans`는 `plan`,
+  `superpowers:systematic-debugging`은 `systematic-debugging`,
+  `superpowers:test-driven-development`는 `test-driven-development`
+  빌트인을 먼저 로드한 뒤 승인 게이트·SDD·보조 자료·완료 규칙을 추가합니다.
+- `superpowers:requesting-code-review`는 승인된 플랜과 요구사항 준수 여부를
+  검토하므로 유지합니다. 같은 이름의 평면 Hermes 스킬은 별도의 pre-commit
+  보안·품질 파이프라인입니다.
+- `simplify-code`는 사용자가 명시적으로 요청했을 때만 선택적으로 실행하고,
+  `python-debugpy`는 Python 체계적 디버깅 중 상태 관찰이 필요할 때만 사용합니다.
 
 ## 설치
 
@@ -54,7 +71,7 @@ hermes plugins list
 ```
 
 `superpowers`가 `Source: git`(옵션 B) 또는 로컬 디렉토리(옵션 A), 버전
-`0.1.0`, 상태 `not enabled`로 표시되어야 합니다 — 플러그인은 기본적으로
+`0.2.0`, 상태 `not enabled`로 표시되어야 합니다 — 플러그인은 기본적으로
 옵트인입니다. 활성화:
 
 ```bash
@@ -159,9 +176,9 @@ Claude Code → Hermes 전체 툴 매핑과 정본 재동기화 시 적용되는
   읽고 지키는 것에 달려 있습니다.
 - **Skill tool 대신 `skill_view`.** Claude Code의 `Skill tool` /
   `superpowers:<name>` 호출은 Hermes에서 `skill_view("superpowers:<name>")`가
-  됩니다. 14개 스킬 전부가 `tools_dev/sync_upstream.py`로 기계적으로
-  재매핑되었고, 몇 군데는 `tools_dev/MANUAL_FIXUPS.md`에 기록된 손수
-  작성한 문단이 추가되어 있습니다.
+  됩니다. 11개 스킬 본문은 `tools_dev/sync_upstream.py`로 기계적으로
+  재매핑하고, 3개는 Hermes 빌트인을 호출하는 보호된 어댑터로 유지합니다.
+  손수 작성한 문단과 어댑터 규칙은 `tools_dev/MANUAL_FIXUPS.md`에 기록합니다.
 - **타 하네스 어댑테이션 파일 제거.** 정본에는 이 포트가 실행하지 않는
   하네스(Codex, Pi, Antigravity)용 레퍼런스 문서와 Claude Code 전용
   실습 예제(`CLAUDE_MD_TESTING.md`), 그리고 정본 개발 로그
@@ -199,8 +216,9 @@ Claude Code → Hermes 전체 툴 매핑과 정본 재동기화 시 적용되는
 
 [obra/superpowers](https://github.com/obra/superpowers) 6.1.1(Jesse
 Vincent 작성, MIT 라이선스)을 기반으로 합니다. 여기 실린 14개 스킬
-본문은 정본을 거의 그대로 미러링한 뒤 Hermes 툴 이름만 치환한
-것입니다. 재동기화 절차는 `UPSTREAM.md`를 참고하세요.
+진입점 중 11개 본문은 정본을 거의 그대로 미러링해 Hermes 툴 이름을
+치환했고, 3개는 Hermes 네이티브 어댑터입니다. 재동기화 절차는
+`UPSTREAM.md`를 참고하세요.
 
 ## 라이선스
 
