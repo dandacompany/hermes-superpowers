@@ -26,11 +26,11 @@ _GATED = {"idle", "brainstorming", "design-approved", "planning", "plan-approved
 _REMINDERS = {
     "idle": "Superpowers phase: idle. HARD GATE: no implementation until a design is approved. Start with skill_view(\"superpowers:brainstorming\") for any creative work.",
     "brainstorming": "Superpowers phase: brainstorming. HARD GATE: no implementation code until the user approves a design. Move on with /sp-phase design-approved only after explicit user approval.",
-    "design-approved": "Superpowers phase: design-approved. HARD GATE: still no implementation — write the plan first (skill_view(\"superpowers:writing-plans\")), then /sp-phase planning.",
+    "design-approved": "Superpowers phase: design-approved. HARD GATE: still no implementation — load the Hermes-native plan adapter (skill_view(\"superpowers:writing-plans\")), then /sp-phase planning.",
     "planning": "Superpowers phase: planning. HARD GATE: no implementation until the plan is approved by the user (/sp-phase plan-approved).",
     "plan-approved": "Superpowers phase: plan-approved. HARD GATE: implementation starts only via subagent-driven development (delegate_task implementer+reviewer pairs). Set /sp-phase implementing when dispatching begins.",
     "implementing": "Superpowers phase: implementing. Follow the plan task-by-task with delegate_task implementer + reviewer pairs; commit per task.",
-    "reviewing": "Superpowers phase: reviewing. Run verification-before-completion before claiming done (/sp-phase done).",
+    "reviewing": "Superpowers phase: reviewing. Run the Superpowers requirements review, any explicitly requested simplify-code pass, and verification-before-completion before claiming done (/sp-phase done).",
     "done": "Superpowers phase: done. Workflow complete — reset with /sp-phase idle for the next unit of work.",
 }
 

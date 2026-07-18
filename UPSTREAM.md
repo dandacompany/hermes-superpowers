@@ -1,17 +1,18 @@
 # Upstream tracking
 
-This plugin mirrors [obra/superpowers](https://github.com/obra/superpowers),
-a Claude Code plugin by Jesse Vincent (MIT licensed).
+This plugin is a hybrid port of
+[obra/superpowers](https://github.com/obra/superpowers), a Claude Code plugin
+by Jesse Vincent (MIT licensed).
 
 - **Tracked version:** `6.1.1`
 - **Upstream repo:** https://github.com/obra/superpowers
 - **License:** MIT (Jesse Vincent)
 
-## The 14 mirrored skills
+## The 14 stable skill entry points
 
-`skills/` contains a near-verbatim copy of upstream's 14 skills, with
-Claude-Code tool names mechanically replaced by Hermes equivalents (see
-`references/tool-mapping.md`):
+`skills/` exposes all 14 upstream names. Eleven contain near-verbatim upstream
+bodies with Claude-Code tool names mechanically replaced by Hermes
+equivalents; three are Hermes-native adapters protected from re-sync:
 
 - `brainstorming`
 - `dispatching-parallel-agents`
@@ -28,14 +29,25 @@ Claude-Code tool names mechanically replaced by Hermes equivalents (see
 - `writing-plans`
 - `writing-skills`
 
+Adapter-owned entry points:
+
+- `writing-plans` → flat Hermes `plan`
+- `systematic-debugging` → flat Hermes `systematic-debugging`
+- `test-driven-development` → flat Hermes `test-driven-development`
+
+`requesting-code-review` intentionally remains mirrored because its
+requirements-oriented review contract is different from the flat Hermes
+pre-commit verification skill.
+
 ## Re-syncing from a new upstream release
 
-`tools_dev/sync_upstream.py` copies every skill directory from an upstream
-checkout into `skills/` and applies the mechanical tool-name replacements
+`tools_dev/sync_upstream.py` copies the 11 mirrored skill directories from an
+upstream checkout into `skills/` and applies the mechanical tool-name replacements
 (`Task tool` → `delegate_task`, `AskUserQuestion` → `clarify`, `Skill tool`
 → `skill_view`, `TodoWrite` → "a markdown checklist", `Bash tool` →
 `terminal toolset`), then stamps a "Hermes port note" into each `SKILL.md`
-frontmatter block.
+frontmatter block. `ADAPTER_SKILLS` skips the three adapter-owned directories,
+so their checked-in bodies and supporting files are never overwritten.
 
 ```bash
 python3 tools_dev/sync_upstream.py \
@@ -77,4 +89,6 @@ python3 -m pytest tests/ -q
 `tests/test_no_claude_toolnames.py` fails if any Claude-Code-specific tool
 name leaked through untransformed; `tests/test_manual_fixups.py` fails if
 one of the hand-written sections tracked in `MANUAL_FIXUPS.md` is missing
-after the re-sync.
+after the re-sync. A successful refresh reports 11 synced mirror skills; the
+three adapters remain unchanged and are covered by
+`tests/test_builtin_adapters.py`.

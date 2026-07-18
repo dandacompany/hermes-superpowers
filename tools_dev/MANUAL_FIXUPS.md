@@ -13,6 +13,35 @@ semantics** (how Hermes primitives like `delegate_task`, `clarify`,
 `skill_view`, `max_concurrent_children` behave). The surrounding upstream
 methodology text was left untouched.
 
+## Hermes-native adapter skills (intentionally not upstream mirrors)
+
+Hermes Agent 0.18.0+ includes native `plan`, `systematic-debugging`, and
+`test-driven-development` skills. The plugin keeps its stable namespaced entry
+points but delegates core methodology to those built-ins:
+
+- `skills/writing-plans/SKILL.md` → `skill_view("plan")`
+- `skills/systematic-debugging/SKILL.md` →
+  `skill_view("systematic-debugging")`
+- `skills/test-driven-development/SKILL.md` →
+  `skill_view("test-driven-development")`
+
+Each adapter contains only the Superpowers-specific delta: approval and plan
+format requirements, bundled supporting references, SDD integration, and
+completion routing. `superpowers:requesting-code-review` remains a mirrored
+requirements-review skill because Hermes' flat skill with the same bare name
+implements a different pre-commit verification pipeline.
+
+**Made durable in `tools_dev/sync_upstream.py`:** `ADAPTER_SKILLS` skips these
+three source directories before `copytree`, preserving the checked-in adapters
+and their supporting files during a future upstream refresh.
+
+**Guarded by:** `tests/test_builtin_adapters.py` verifies the native skill
+targets, required Superpowers deltas, 14-entry public registration surface, and
+sync preservation behavior.
+
+**Re-apply after re-sync:** nothing. The sync script must report 11 mirrored
+skills while leaving the three adapters untouched.
+
 ## Other-harness / dev-log leftovers removed (quality cleanup, not scanner-motivated)
 
 Upstream `superpowers` ships adaptation docs and dev artifacts for harnesses

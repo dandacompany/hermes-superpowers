@@ -309,6 +309,21 @@ a ledger file, not only in todos.
 - [task-reviewer-prompt.md](task-reviewer-prompt.md) - Dispatch task reviewer subagent (spec compliance + code quality)
 - Final whole-branch review: use superpowers:requesting-code-review's [code-reviewer.md](../requesting-code-review/code-reviewer.md)
 
+## Hermes-Native Final Gates
+
+After every planned task is green and its task review has passed:
+
+1. If and only if the user explicitly requested simplification or cleanup,
+   load the flat `simplify-code` skill. Re-run affected tests afterward.
+2. Run the final whole-branch requirements review with
+   `superpowers:requesting-code-review`. This review checks the branch against
+   the approved plan and requirements; do not replace it with the flat skill.
+3. When the user is preparing to commit, push, or merge, load the flat
+   `requesting-code-review` skill as a separate Hermes-native pre-commit
+   security and quality gate.
+4. Load `superpowers:verification-before-completion` before any completion
+   claim.
+
 ## Example Workflow
 
 ```
@@ -449,6 +464,8 @@ Done!
 - **superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
 - **superpowers:writing-plans** - Creates the plan this skill executes
 - **superpowers:requesting-code-review** - Code review template for the final whole-branch review
+- **requesting-code-review** (flat Hermes built-in) - Optional final pre-commit security and quality gate after requirements review
+- **simplify-code** (flat Hermes built-in) - Optional cleanup only when explicitly requested by the user
 - **superpowers:finishing-a-development-branch** - Complete development after all tasks
 
 **Subagents should use:**
