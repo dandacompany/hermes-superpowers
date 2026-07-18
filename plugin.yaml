@@ -1,5 +1,5 @@
 name: superpowers
-version: 0.2.0
+version: 0.3.0
 description: >
   Hermes-native hybrid port of obra/superpowers — 14 stable process-skill
   entry points, built-in adapters, session gate hooks, and subagent-driven
@@ -7,6 +7,7 @@ description: >
 author: Dante Labs
 provides_tools:
   - superpowers_phase
+  - superpowers_visual_companion
 provides_hooks:
   - pre_llm_call
   - on_session_start

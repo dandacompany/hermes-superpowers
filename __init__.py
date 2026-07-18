@@ -39,6 +39,14 @@ def register(ctx):
         handler=tools.phase_handler,
         description="Transition the superpowers workflow phase")
 
+    ctx.register_tool(
+        name="superpowers_visual_companion",
+        toolset="superpowers",
+        schema=tools.VISUAL_COMPANION_TOOL_SCHEMA,
+        handler=tools.visual_companion_handler,
+        description="Show visual brainstorming screens in the user's browser",
+        emoji="🖼️")
+
     ctx.register_command(
         "superpowers", commands.handle_superpowers,
         description="Load the superpowers workflow entry point")

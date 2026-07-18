@@ -32,6 +32,37 @@ The server watches a directory for HTML files and serves the newest one to the b
 
 ## Starting a Session
 
+### Hermes Agent (native plugin tool)
+
+The visual companion is registered as `superpowers_visual_companion`. Do not
+launch its scripts through `terminal` on Hermes. First obtain approval through
+`clarify`, then call:
+
+```json
+{
+  "action": "start",
+  "project_dir": "/absolute/path/to/project",
+  "user_approved": true,
+  "open_browser": true
+}
+```
+
+Save the returned `session_dir` and complete URL. Push each fresh visual screen
+with `action="show"`, a unique `.html` filename, and an HTML fragment. On the
+next user turn, call `action="events"` to read browser choices. Use
+`action="status"` before referring to an existing URL and `action="stop"` when
+the brainstorming session is finished.
+
+Visual questions belong on the browser screen. Do not repeat them as plain
+assistant text. If a question expects a textual response, use `clarify`
+instead. The user's normal message remains primary feedback; browser events
+provide structured supplemental evidence.
+
+The tool rejects `start` unless `user_approved` is exactly `true`. Set it only
+from the immediately preceding `clarify` result; never infer approval.
+
+### Script fallback for other harnesses
+
 ```bash
 # Start AFTER the user approves the companion. --open auto-opens their browser on
 # the first screen; --project-dir persists mockups and enables same-port restart.
@@ -58,6 +89,9 @@ without repeating it.
 **Note:** Pass the project root as `--project-dir` so mockups persist in `.superpowers/brainstorm/` and survive server restarts. Without it, files go to `/tmp` and get cleaned up. Remind the user to add `.superpowers/` to `.gitignore` if it's not already there.
 
 **Launching the server by platform:**
+
+**Hermes:** use the registered `superpowers_visual_companion` tool described
+above. The tool owns the background server lifecycle and browser launch.
 
 **Claude Code:**
 ```bash

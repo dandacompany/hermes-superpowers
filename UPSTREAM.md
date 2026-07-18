@@ -48,6 +48,10 @@ upstream checkout into `skills/` and applies the mechanical tool-name replacemen
 `terminal toolset`), then stamps a "Hermes port note" into each `SKILL.md`
 frontmatter block. `ADAPTER_SKILLS` skips the three adapter-owned directories,
 so their checked-in bodies and supporting files are never overwritten.
+`PROTECTED_SKILL_FILES` separately preserves `brainstorming/SKILL.md` and
+`brainstorming/visual-companion.md`, which contain the Hermes `clarify` gate
+and native Visual Companion lifecycle. The remaining brainstorming scripts
+and assets still refresh from upstream.
 
 ```bash
 python3 tools_dev/sync_upstream.py \

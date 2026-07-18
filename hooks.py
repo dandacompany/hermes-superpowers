@@ -16,6 +16,14 @@ WRITE_TOOLS = {"write_file", "patch"}
 
 _SKILL_DIR = Path(__file__).parent / "skills"
 
+QUESTION_GATE = (
+    "HERMES QUESTION GATE: Every user-facing question MUST use clarify; "
+    "never ask it in plain assistant text. Ask exactly one question per "
+    "clarify call. A visual choice may instead be shown through "
+    "superpowers_visual_companion after the user approved that companion "
+    "via clarify."
+)
+
 
 def bootstrap_text() -> str:
     """Load using-superpowers SKILL.md or fall back to comprehensive reminder.
@@ -54,7 +62,12 @@ def pre_llm_call(session_id, user_message, conversation_history, is_first_turn, 
     try:
         if is_first_turn:
             text = bootstrap_text()
-            return {"context": "<superpowers-bootstrap>\n" + text + "\n</superpowers-bootstrap>"}
+            return {
+                "context": (
+                    "<superpowers-bootstrap>\n" + text + "\n" + QUESTION_GATE
+                    + "\n</superpowers-bootstrap>"
+                )
+            }
         phase = state.load_phase(session_id)
         reminder = state.reminder_for(phase)
         if state.is_escalated(session_id):
@@ -65,7 +78,12 @@ def pre_llm_call(session_id, user_message, conversation_history, is_first_turn, 
                 "implementation work, STOP and return to the design/plan gate. "
                 + reminder
             )
-        return {"context": "<superpowers-gate>" + reminder + "</superpowers-gate>"}
+        return {
+            "context": (
+                "<superpowers-gate>" + reminder + " " + QUESTION_GATE
+                + "</superpowers-gate>"
+            )
+        }
     except Exception:
         return {}
 

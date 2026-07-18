@@ -19,7 +19,8 @@ to Hermes' own built-ins.
 Where upstream targets Claude Code, this plugin re-implements the same
 skills and workflow discipline as a Hermes plugin: `plugin.yaml` +
 `register(ctx)` wiring, a small phase state machine, three slash commands,
-and one tool the agent can call to advance the workflow.
+and two native tools: workflow phase transitions and a browser-based Visual
+Companion.
 
 ## Requirements and native adapters
 
@@ -39,6 +40,22 @@ and one tool the agent can call to advance the workflow.
 - `simplify-code` is optional and only runs on explicit user request;
   `python-debugpy` is a conditional evidence-gathering helper inside Python
   systematic debugging.
+
+## Question gate and Visual Companion
+
+- Every user-facing question must call Hermes' `clarify` tool. The rule covers
+  clarifications, feedback, design/plan approval, review prompts, and the offer
+  to use the Visual Companion. Plain assistant-text questions are forbidden.
+- The question gate is present in both workflow skills and is re-injected by
+  `pre_llm_call` on every turn. Questions are limited to one per `clarify`
+  call. `delegate_task` children return a `QUESTIONS` section for the parent to
+  relay because children cannot interact with the user.
+- After the user accepts through `clarify`, the
+  `superpowers_visual_companion` tool provides the upstream browser workflow
+  natively on Hermes: `start`, `show`, `events`, `status`, and `stop`.
+- Visual choices live only in the browser screen. Textual follow-up questions
+  return to `clarify`; the agent must not duplicate a browser question in
+  ordinary prose.
 
 ## Install
 
@@ -78,7 +95,7 @@ hermes plugins list
 ```
 
 You should see `superpowers` listed with `Source: git` (Option B) or a
-local directory (Option A), version `0.2.0`, and status `not enabled` —
+local directory (Option A), version `0.3.0`, and status `not enabled` —
 plugins are opt-in by default. Enable it:
 
 ```bash
@@ -86,8 +103,8 @@ hermes plugins enable superpowers
 ```
 
 This prompts `Allow this plugin to replace built-in tools (e.g. shell_exec,
-write_file)? [y/N]` — answer **no**. This plugin only registers hooks, one
-tool, and three commands; it does not override any built-in tool. Restart
+write_file)? [y/N]` — answer **no**. This plugin only registers hooks, two
+tools, and three commands; it does not override any built-in tool. Restart
 your session (or the gateway, `hermes gateway restart`) for the plugin to
 take effect.
 
@@ -124,7 +141,8 @@ reminder-based, not enforcement-based:
   upstream's `SessionStart` hook.
 - **Per-turn gate reminder** (`pre_llm_call`, every later turn): injects a
   one-line `<superpowers-gate>` reminder of the current phase and what's
-  gating it (e.g. "no implementation until a design is approved").
+  gating it (e.g. "no implementation until a design is approved"), plus the
+  mandatory `clarify` question gate.
 - **Write-tool escalation** (`post_tool_call` + next `pre_llm_call`): if a
   file-writing tool (`write_file`, `patch`) runs while the workflow is in a
   pre-implementation phase (`idle` through `plan-approved`), the next

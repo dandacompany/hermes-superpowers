@@ -4,6 +4,7 @@
 | -------------------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------- |
 | Task tool (subagent dispatch)                | `delegate_task(goal, context, toolsets)`          | batch: `tasks=[...]`; children have NO parent history, NO user interaction    |
 | AskUserQuestion                              | `clarify`                                         | unavailable inside delegate_task children — the orchestrator relays questions |
+| Visual Companion scripts                    | `superpowers_visual_companion`                    | native start/show/events/status/stop lifecycle; offer must use `clarify`      |
 | Skill tool / `superpowers:<name>` invocation | `skill_view("superpowers:<name>")`                | plugin-bundled skills                                                         |
 | TodoWrite                                    | markdown checklist (durable work: Hermes Kanban)  |                                                                               |
 | SessionStart / PostCompact hooks             | `pre_llm_call` injection (first turn = bootstrap) | plugin does this automatically                                                |

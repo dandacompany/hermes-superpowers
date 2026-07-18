@@ -19,6 +19,13 @@ ADAPTER_SKILLS = {
     "test-driven-development",
 }
 
+# These files contain Hermes interaction contracts layered on top of an
+# otherwise mirrored upstream skill. Preserve them verbatim during sync; a
+# maintainer must consciously rebase the Hermes delta when upstream changes.
+PROTECTED_SKILL_FILES = {
+    "brainstorming": {"SKILL.md", "visual-companion.md"},
+}
+
 REPLACEMENTS = [
     # --- multi-word / longer patterns first, so shorter ones don't clobber them ---
     (r"\bthe Task tool\b", "delegate_task"),
@@ -84,10 +91,21 @@ def sync(source: Path, dest: Path) -> list[str]:
         if skill_dir.name in ADAPTER_SKILLS:
             continue
         target = dest / skill_dir.name
+        preserved = {}
+        for relpath in PROTECTED_SKILL_FILES.get(skill_dir.name, set()):
+            existing = target / relpath
+            if existing.is_file():
+                preserved[relpath] = existing.read_bytes()
         if target.exists():
             shutil.rmtree(target)
         shutil.copytree(skill_dir, target)
+        for relpath, content in preserved.items():
+            protected = target / relpath
+            protected.parent.mkdir(parents=True, exist_ok=True)
+            protected.write_bytes(content)
         for md in target.rglob("*.md"):
+            if md.relative_to(target).as_posix() in preserved:
+                continue
             text = transform(md.read_text(encoding="utf-8"))
             if md.name == "SKILL.md" and "Hermes port note" not in text:
                 # frontmatter(--- ... ---) 직후에 노트 삽입
